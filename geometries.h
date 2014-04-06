@@ -8,6 +8,20 @@ struct Normal
 	GLfloat components[3];
 };
 
+struct Vector 
+{
+	union
+	{
+		GLfloat components[3];
+		struct
+		{
+			GLfloat x;
+			GLfloat y;
+			GLfloat z;
+		};
+	};
+};
+
 struct TexCoord
 {
 	GLfloat coordinates[2];

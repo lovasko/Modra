@@ -3,6 +3,28 @@
 #include <iostream>
 #include <map>
 
+struct Normal
+compute_normal (struct Vector a, struct Vector b)
+{
+	struct Normal result;
+	result.components[0] = a.y * b.z - a.z * b.y;
+	result.components[1] = a.z * b.x - a.x * b.z;
+	result.components[2] = a.y * b.y - a.y * b.x;
+
+	return result;
+}
+
+struct Vector
+operator-(struct Point a, struct Point b)
+{
+	struct Vector result;
+	result.x = a.components[0] - b.components[0];
+	result.y = a.components[1] - b.components[1];
+	result.z = a.components[2] - b.components[2];
+
+	return result;
+}
+
 std::vector<struct Triangle> 
 create_sierpinsky_tetrahedron(struct Tetrahedron base, unsigned int depth)
 {
@@ -22,15 +44,33 @@ create_sierpinsky_tetrahedron(struct Tetrahedron base, unsigned int depth)
 
 		if (top.second == 0)
 		{
+			struct Normal n;
+
+			n = compute_normal(a - b, a - c); 
+			a.normal = n;
+			b.normal = n;
+			c.normal = n;
 			struct Triangle t1 {a, b, c};
 			result.push_back(t1);
 
+			n = compute_normal(a - b, a - d); 
+			a.normal = n;
+			b.normal = n;
+			d.normal = n;
 			struct Triangle t2 {a, b, d};
 			result.push_back(t2);
 
+			n = compute_normal(a - d, a - c); 
+			a.normal = n;
+			d.normal = n;
+			c.normal = n;
 			struct Triangle t3  {a, d, c};
 			result.push_back(t3);
 
+			n = compute_normal(b - c, b - d); 
+			b.normal = n;
+			c.normal = n;
+			d.normal = n;
 			struct Triangle t4 {b, c, d};
 			result.push_back(t4);
 		}
