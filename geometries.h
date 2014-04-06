@@ -3,24 +3,42 @@
 
 #include <OpenGL/gl.h>
 
-struct point
+struct Normal 
 {
 	GLfloat components[3];
 };
 
-struct triangle 
+struct TexCoord
 {
-	struct point points[3];
+	GLfloat coordinates[2];
 };
 
-struct quad 
+struct Color
 {
-	struct point points[4];
+	GLfloat components[4];
 };
 
-struct tetrahedron
+struct Point
 {
-	struct point points[4];
+	GLfloat components[3];
+	struct Normal normal;
+	struct Color color;
+	struct TexCoord tex_coord;
+};
+
+struct Triangle 
+{
+	struct Point points[3];
+};
+
+struct Quad 
+{
+	struct Point points[4];
+};
+
+struct Tetrahedron
+{
+	struct Point points[4];
 };
 
 #endif

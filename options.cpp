@@ -15,6 +15,7 @@ parse_options (int argc, char *argv[])
 		switch(option)
 		{
 		// TODO use strtol
+		// TODO check sign
 		case 'd': 
 			fractal_depth = atoi(optarg);
 		break;
@@ -33,11 +34,11 @@ parse_options (int argc, char *argv[])
 
 		case 'm': 
 			if (strcmp("immediate", optarg) == 0)
-				drawing = IMMEDIATE;
+				drawing_method = IMMEDIATE;
 			else if (strcmp("vertex-buffer", optarg) == 0)
-				drawing = VERTEX_BUFFER;
+				drawing_method = VERTEX_BUFFER;
 			else if (strcmp("index-buffer", optarg) == 0)
-				drawing = INDEX_BUFFER;
+				drawing_method = INDEX_BUFFER;
 			else
 			{
 				fprintf(stderr, "unsupported drawing method\n");
@@ -47,9 +48,9 @@ parse_options (int argc, char *argv[])
 
 		case 's': 
 			if (strcmp("flat", optarg) == 0)
-				shading = FLAT;
+				shading_method = FLAT;
 			else if (strcmp("smooth", optarg) == 0)
-				shading = SMOOTH;
+				shading_method = SMOOTH;
 			else
 			{
 				fprintf(stderr, "unsupported shading method\n");

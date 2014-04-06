@@ -7,9 +7,9 @@
 #include "geometries.h"
 
 GLfloat*
-convert_to_arrayf(std::vector<struct triangle> triangles);
+convert_to_arrayf(std::vector<struct Triangle> triangles);
 
 GLfloat*
-convert_to_arrayf(std::vector<struct quad> quads);
+convert_to_arrayf(std::vector<struct Quad> quads);
 
 #endif

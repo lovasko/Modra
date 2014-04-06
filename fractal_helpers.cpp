@@ -4,10 +4,8 @@
 #include "fractal_helpers.h"
 
 GLfloat*
-convert_to_arrayf(std::vector<struct triangle> triangles)
+convert_to_arrayf(std::vector<struct Triangle> triangles)
 {
-	// each triangle has 3 vertices
-	// each vertex has 3 components
 	size_t size = triangles.size() * 3 * 3;
 	GLfloat *result = (GLfloat*)malloc(sizeof(GLfloat) * size);
 

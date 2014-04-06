@@ -5,7 +5,7 @@
 
 #include "geometries.h"
 
-std::vector<struct triangle> 
-create_sierpinsky_tetrahedron(struct tetrahedron th, unsigned int depth);
+std::vector<struct Triangle> 
+create_sierpinsky_tetrahedron(struct Tetrahedron base, unsigned int depth);
 
 #endif

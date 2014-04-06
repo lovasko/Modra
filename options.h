@@ -3,11 +3,11 @@
 
 #include "enums.h"
 
-extern enum fractal_type fractal;
+extern enum Fractal fractal;
 extern unsigned int fractal_depth;
-extern enum drawing_method drawing;
-extern enum shading_method shading;
-extern enum vertex_buffer_type vertex_buffer;
+extern enum DrawingMethod drawing_method;
+extern enum ShadingMethod shading_method;
+extern enum VertexBuffer vertex_buffer;
 extern bool light_flag;
 extern bool wireframe_flag;
 extern bool texture_flag;

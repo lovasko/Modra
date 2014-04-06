@@ -1,26 +1,26 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
-enum fractal_type
+enum Fractal
 {
 	SIERPINSKY_TETRAHEDRON,
 	MENGER_SPONGE
 };
 
-enum drawing_method
+enum DrawingMethod
 {
 	IMMEDIATE,
 	VERTEX_BUFFER,
 	INDEX_BUFFER
 };
 
-enum shading_method
+enum ShadingMethod
 {
 	FLAT,
 	SMOOTH
 };
 
-enum vertex_buffer_type
+enum VertexBuffer
 {
 	SEPARATE,
 	INTERLEAVED
