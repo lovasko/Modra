@@ -30,7 +30,6 @@ unsigned int fractal_depth = 5;
 enum drawing_method drawing = IMMEDIATE;
 enum shading_method shading = FLAT;
 enum vertex_buffer_type vertex_buffer = SEPARATE;
-enum floating_numbers_type floating_numbers = SINGLE;
 bool light_flag = false;
 bool wireframe_flag = false;
 bool texture_flag = false;

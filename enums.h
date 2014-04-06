@@ -26,11 +26,5 @@ enum vertex_buffer_type
 	INTERLEAVED
 };
 
-enum floating_numbers_type
-{
-	SINGLE,
-	DOUBLE
-};
-
 #endif
 

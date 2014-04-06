@@ -57,18 +57,6 @@ parse_options (int argc, char *argv[])
 			}
 		break;
 
-		case 'f': 
-			if (strcmp("single", optarg) == 0)
-				floating_numbers = SINGLE;
-			else if (strcmp("double", optarg) == 0)
-				floating_numbers = DOUBLE;
-			else
-			{
-				fprintf(stderr, "unsupported floating numbers format\n");
-				exit(1);
-			}
-		break;
-
 		case 'b': 
 			if (strcmp("on", optarg) == 0)
 				blending_flag = true;
