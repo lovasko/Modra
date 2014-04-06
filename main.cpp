@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include <GL/glew.h>
 #include <SDL/SDL.h>
 #include <OpenGL/gl.h>
@@ -12,6 +13,8 @@
 #include "sierpinsky_tetrahedron.h"
 #include "opengl_properties.h"
 #include "geometries.h"
+#include "enums.h"
+#include "options.h"
 
 SDL_Surface *surface;
 bool vbo_capable;
@@ -22,12 +25,16 @@ GLfloat angle;
 GLfloat *triangles;
 size_t triangles_size;
 
-enum drawing_method
-{
-	DIRECT,
-	VERTEX_BUFFER,
-	INDEX_BUFFER
-};
+enum fractal_type fractal = SIERPINSKY_TETRAHEDRON;
+unsigned int fractal_depth = 5;
+enum drawing_method drawing = IMMEDIATE;
+enum shading_method shading = FLAT;
+enum vertex_buffer_type vertex_buffer = SEPARATE;
+enum floating_numbers_type floating_numbers = SINGLE;
+bool light_flag = false;
+bool wireframe_flag = false;
+bool texture_flag = false;
+bool blending_flag = false;
 
 void 
 quit (int return_code)
@@ -83,13 +90,49 @@ resize_viewport ()
 void
 init_opengl ()
 {
-  glShadeModel(GL_SMOOTH);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClearDepth(20.0f);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 	resize_viewport();
+
+	if (blending_flag)
+	{
+		glDisable(GL_DEPTH_TEST);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+
+	if (wireframe_flag)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		
+	}
+
+	if (light_flag)
+	{
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+	}
+
+	if (texture_flag)
+	{
+		glEnable(GL_TEXTURE_2D);
+	}
+
+	switch (shading)
+	{
+		case FLAT:
+			glShadeModel(GL_FLAT);
+		break;
+
+		case SMOOTH:
+			glShadeModel(GL_SMOOTH);
+		break;
+
+		default:
+		break;
+	}
 }
 
 void
@@ -131,13 +174,12 @@ draw_scene ()
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glLoadIdentity();
 
-	glTranslatef(0.0, 0.0, -10.0f);
+	glTranslatef(0.0, 0.0, -10.0f + sin(angle/10.0) * 0.75);
 	apply_animation();
 	glScalef(2.6, 2.6, 2.6);
+	glColor4f(1.0, 0.6, 0.0, 0.5);
 
-	glColor3f(1.0, 0.6, 0.0);
 	glBegin(GL_TRIANGLES);
-			
 		for (unsigned int i = 0; i < triangles_size; i++)
 		{
 			int k = i * 9;
@@ -145,7 +187,6 @@ draw_scene ()
 			glVertex3fv(triangles + k + 3);
 			glVertex3fv(triangles + k + 6);
 		}
-
 	glEnd();
 
   glFlush();
@@ -193,19 +234,7 @@ main_loop()
 	return EXIT_SUCCESS;
 }
 
-void
-parse_options (int argc, char *argv[])
-{
-	// -d depth_value
-	// -o (sierpinsky | menger)
-	// -m (direct | vertex-buffer | index-buffer)
-	// -l (on | off)
-	// -w (on | off)
-	// -t (on | off)
-	// -b (on | off)
-	// -s (flat | smooth)
-}
-
+// apply object flag
 int 
 main (int argc, char *argv[])
 {
@@ -224,7 +253,8 @@ main (int argc, char *argv[])
 	point td {{-1.0, -1.0, 1.0}};
 
 	struct tetrahedron t {ta, tb, tc, td};
-	std::vector<struct triangle> tv = create_sierpinsky_tetrahedron(t, 8);
+	std::vector<struct triangle> tv = create_sierpinsky_tetrahedron(t,
+	    fractal_depth);
 	triangles = convert_to_arrayf(tv);
 	triangles_size = tv.size();
 
