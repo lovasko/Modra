@@ -22,14 +22,15 @@ bool done;
 bool is_active;
 GLfloat angle;
 
-GLfloat *triangles;
-size_t triangles_size;
+GLfloat *data;
+size_t data_block_count;
+size_t data_block_size;
 
-enum fractal_type fractal = SIERPINSKY_TETRAHEDRON;
+enum Fractal fractal = SIERPINSKY_TETRAHEDRON;
 unsigned int fractal_depth = 5;
-enum drawing_method drawing = IMMEDIATE;
-enum shading_method shading = FLAT;
-enum vertex_buffer_type vertex_buffer = SEPARATE;
+enum DrawingMethod drawing_method = IMMEDIATE;
+enum ShadingMethod shading_method = FLAT;
+enum VertexBuffer vertex_buffer = SEPARATE;
 bool light_flag = false;
 bool wireframe_flag = false;
 bool texture_flag = false;
@@ -119,7 +120,7 @@ init_opengl ()
 		glEnable(GL_TEXTURE_2D);
 	}
 
-	switch (shading)
+	switch (shading_method)
 	{
 		case FLAT:
 			glShadeModel(GL_FLAT);
@@ -179,12 +180,12 @@ draw_scene ()
 	glColor4f(1.0, 0.6, 0.0, 0.5);
 
 	glBegin(GL_TRIANGLES);
-		for (unsigned int i = 0; i < triangles_size; i++)
+		for (unsigned int i = 0; i < data_block_count; i++)
 		{
-			int k = i * 9;
-			glVertex3fv(triangles + k);
-			glVertex3fv(triangles + k + 3);
-			glVertex3fv(triangles + k + 6);
+			int k = i * 9;//data_block_size;
+			glVertex3fv(data + k);
+			glVertex3fv(data + k + 3);
+			glVertex3fv(data + k + 6);
 		}
 	glEnd();
 
@@ -246,16 +247,18 @@ main (int argc, char *argv[])
 
 	print_opengl_properties();
 
-	point ta {{1.0, 1.0, 1.0}};
-	point tb {{1.0, -1.0, -1.0}};
-	point tc {{-1.0, 1.0, -1.0}};
-	point td {{-1.0, -1.0, 1.0}};
+	Point a {{ 1.0,  1.0,  1.0}};
+	Point b {{ 1.0, -1.0, -1.0}};
+	Point c {{-1.0,  1.0, -1.0}};
+	Point d {{-1.0, -1.0,  1.0}};
 
-	struct tetrahedron t {ta, tb, tc, td};
-	std::vector<struct triangle> tv = create_sierpinsky_tetrahedron(t,
-	    fractal_depth);
-	triangles = convert_to_arrayf(tv);
-	triangles_size = tv.size();
+	struct Tetrahedron tetrahedron {a, b, c, d};
+	std::vector<struct Triangle> triangles =
+	    create_sierpinsky_tetrahedron(tetrahedron, fractal_depth);
+
+	data = convert_to_arrayf(triangles);
+	data_block_count = triangles.size();
+	data_block_size = 3 + 3 + 4 + 2;
 
 	return main_loop();
 }
