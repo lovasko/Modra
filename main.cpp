@@ -8,6 +8,7 @@
 #include <SDL/SDL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#include <iostream>
 
 #include "fractal_helpers.h"
 #include "sierpinsky_tetrahedron.h"
@@ -29,7 +30,7 @@ size_t data_block_size;
 enum Fractal fractal = SIERPINSKY_TETRAHEDRON;
 unsigned int fractal_depth = 5;
 enum DrawingMethod drawing_method = IMMEDIATE;
-enum ShadingMethod shading_method = FLAT;
+enum ShadingMethod shading_method = SMOOTH;
 enum VertexBuffer vertex_buffer = SEPARATE;
 bool light_flag = false;
 bool wireframe_flag = false;
@@ -90,6 +91,7 @@ resize_viewport ()
 void
 init_opengl ()
 {
+	glShadeModel(GL_SMOOTH);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClearDepth(20.0f);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -113,12 +115,27 @@ init_opengl ()
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
+		glEnable(GL_COLOR_MATERIAL);
+		glEnable(GL_NORMALIZE);
+		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+		GLfloat ambientLight[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+		GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+		GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+		GLfloat position[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+		glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+		glLightfv(GL_LIGHT0, GL_POSITION, position);
 	}
 
+	/*
 	if (texture_flag)
 	{
 		glEnable(GL_TEXTURE_2D);
 	}
+	*/
 
 	switch (shading_method)
 	{
@@ -177,15 +194,26 @@ draw_scene ()
 	glTranslatef(0.0, 0.0, -10.0f + sin(angle/10.0) * 0.75);
 	apply_animation();
 	glScalef(2.6, 2.6, 2.6);
-	glColor4f(1.0, 0.6, 0.0, 0.5);
 
 	glBegin(GL_TRIANGLES);
 		for (unsigned int i = 0; i < data_block_count; i++)
 		{
-			int k = i * 9;//data_block_size;
-			glVertex3fv(data + k);
-			glVertex3fv(data + k + 3);
-			glVertex3fv(data + k + 6);
+			unsigned int k = i * 36;
+
+			glTexCoord2fv(data + k + 0);
+			glColor4fv(data + k + 2);
+			glNormal3fv(data + k + 6);
+			glVertex3fv(data + k + 9);
+
+			glTexCoord2fv(data + k + 12);
+			glColor4fv(data + k + 14);
+			glNormal3fv(data + k + 18);
+			glVertex3fv(data + k + 21);
+
+			glTexCoord2fv(data + k + 24);
+			glColor4fv(data + k + 26);
+			glNormal3fv(data + k + 30);
+			glVertex3fv(data + k + 33);
 		}
 	glEnd();
 
@@ -258,7 +286,7 @@ main (int argc, char *argv[])
 
 	data = convert_to_arrayf(triangles);
 	data_block_count = triangles.size();
-	data_block_size = 3 + 3 + 4 + 2;
+	//data_block_size = 3 + 3 + 4 + 2;
 
 	return main_loop();
 }
