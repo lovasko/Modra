@@ -9,13 +9,19 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <iostream>
+#include <vector>
+#include <chrono>
+#include <algorithm>
+#include <functional>
+#include <numeric>
+#include <signal.h>
 
 #include "fractal_helpers.h"
 #include "sierpinsky_tetrahedron.h"
-#include "opengl_properties.h"
 #include "geometries.h"
 #include "enums.h"
 #include "options.h"
+#include "stats.h"
 
 SDL_Surface *surface;
 bool vbo_capable;
@@ -36,6 +42,8 @@ bool light_flag = false;
 bool wireframe_flag = false;
 bool texture_flag = false;
 bool blending_flag = false;
+std::vector<long> draw_times;
+std::vector<long> swap_times;
 
 void 
 quit (int return_code)
@@ -223,7 +231,6 @@ draw_scene ()
 int
 main_loop()
 {
-	done = false;
 	is_active = true;
 	SDL_Event event;
 	
@@ -254,26 +261,58 @@ main_loop()
 		if (is_active)
 		{
 			step_animation();
+
+			using namespace std::chrono;
+
+			auto start = high_resolution_clock::now();
 			draw_scene();
+			auto end = high_resolution_clock::now();
+			auto delta = duration_cast<microseconds>(end - start).count();
+			draw_times.push_back(delta);
+
+			start = high_resolution_clock::now();
 			SDL_GL_SwapBuffers();
+			end = high_resolution_clock::now();
+			delta = duration_cast<microseconds>(end - start).count();
+			swap_times.push_back(delta);
 		}
 	}
-
+	
 	return EXIT_SUCCESS;
+}
+
+void sigint_handler (int sig)
+{
+	(void) sig;
+
+	print_stats(std::string("draw"), draw_times);
+	print_stats(std::string("swap"), swap_times);
+	done = true;
+}
+
+void catch_sigint()
+{
+	struct sigaction new_sa;
+	struct sigaction old_sa;
+
+	sigfillset(&new_sa.sa_mask);
+	new_sa.sa_handler = sigint_handler;
+	new_sa.sa_flags = 0;
+
+	sigaction(SIGINT, &new_sa, 0);
 }
 
 // apply object flag
 int 
 main (int argc, char *argv[])
 {
+	catch_sigint();
 	parse_options(argc, argv);
 
 	init_sdl();
 	init_opengl();
 	init_extensions();
 	init_animation();
-
-	print_opengl_properties();
 
 	Point a {{ 1.0,  1.0,  1.0}};
 	Point b {{ 1.0, -1.0, -1.0}};
