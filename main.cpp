@@ -281,7 +281,8 @@ main_loop()
 	return EXIT_SUCCESS;
 }
 
-void sigint_handler (int sig)
+void 
+sigint_handler (int sig)
 {
 	(void) sig;
 
@@ -290,7 +291,8 @@ void sigint_handler (int sig)
 	done = true;
 }
 
-void catch_sigint()
+void 
+catch_sigint()
 {
 	struct sigaction new_sa;
 	struct sigaction old_sa;
@@ -301,6 +303,7 @@ void catch_sigint()
 
 	sigaction(SIGINT, &new_sa, 0);
 }
+
 
 // apply object flag
 int 
