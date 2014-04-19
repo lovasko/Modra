@@ -18,6 +18,7 @@
 
 #include "fractal_helpers.h"
 #include "sierpinsky_tetrahedron.h"
+#include "menger_sponge.h"
 #include "geometries.h"
 #include "enums.h"
 #include "options.h"
@@ -203,27 +204,63 @@ draw_scene ()
 	apply_animation();
 	glScalef(2.6, 2.6, 2.6);
 
-	glBegin(GL_TRIANGLES);
-		for (unsigned int i = 0; i < data_block_count; i++)
-		{
-			unsigned int k = i * 36;
+	if (fractal == SIERPINSKY_TETRAHEDRON)
+	{
+		glBegin(GL_TRIANGLES);
+			for (unsigned int i = 0; i < data_block_count; i++)
+			{
+				unsigned int k = i * 36;
 
-			glTexCoord2fv(data + k + 0);
-			glColor4fv(data + k + 2);
-			glNormal3fv(data + k + 6);
-			glVertex3fv(data + k + 9);
+				glTexCoord2fv(data + k + 0);
+				glColor4fv(data + k + 2);
+				glNormal3fv(data + k + 6);
+				glVertex3fv(data + k + 9);
 
-			glTexCoord2fv(data + k + 12);
-			glColor4fv(data + k + 14);
-			glNormal3fv(data + k + 18);
-			glVertex3fv(data + k + 21);
+				glTexCoord2fv(data + k + 12);
+				glColor4fv(data + k + 14);
+				glNormal3fv(data + k + 18);
+				glVertex3fv(data + k + 21);
 
-			glTexCoord2fv(data + k + 24);
-			glColor4fv(data + k + 26);
-			glNormal3fv(data + k + 30);
-			glVertex3fv(data + k + 33);
-		}
-	glEnd();
+				glTexCoord2fv(data + k + 24);
+				glColor4fv(data + k + 26);
+				glNormal3fv(data + k + 30);
+				glVertex3fv(data + k + 33);
+			}
+		glEnd();
+	}
+	else if (fractal == MENGER_SPONGE)
+	{
+		glBegin(GL_QUADS);
+			for (unsigned int i = 0; i < data_block_count; i++)
+			{
+				unsigned int k = i * 48;
+
+				glTexCoord2fv(data + k + 0);
+				glColor4fv(data + k + 2);
+				glNormal3fv(data + k + 6);
+				glVertex3fv(data + k + 9);
+
+				glTexCoord2fv(data + k + 12);
+				glColor4fv(data + k + 14);
+				glNormal3fv(data + k + 18);
+				glVertex3fv(data + k + 21);
+
+				glTexCoord2fv(data + k + 24);
+				glColor4fv(data + k + 26);
+				glNormal3fv(data + k + 30);
+				glVertex3fv(data + k + 33);
+
+				glTexCoord2fv(data + k + 36);
+				glColor4fv(data + k + 38);
+				glNormal3fv(data + k + 42);
+				glVertex3fv(data + k + 45);
+			}
+		glEnd();
+	}
+	else
+	{
+		glClearColor(1.0, 0.0, 0.0, 1.0);
+	}
 
   glFlush();
 }
@@ -281,13 +318,39 @@ main_loop()
 	return EXIT_SUCCESS;
 }
 
+void
+print_test_setup ()
+{
+	std::cout << "Object: " << (fractal == SIERPINSKY_TETRAHEDRON ? "Sierpinsky"
+	    " Tetrahedron" : "Menger Sponge") << " (" << data_block_count << 
+	    " primitives)"<< std::endl;
+	std::cout << "Shading method: " << (shading_method == FLAT ? "Flat" :
+	    "Smooth") << ", ";
+	std::cout << "Drawing method: " << (drawing_method == IMMEDIATE ? 
+	    "Immediate" : (drawing_method == VERTEX_BUFFER ? "Vertex buffer" : 
+	    "Index buffer"));
+	
+	if (drawing_method == VERTEX_BUFFER || drawing_method == INDEX_BUFFER)
+	    std::cout << "Vertex buffer type: " << (vertex_buffer == SEPARATE ?
+	        "Separate" : "Interleaved") << std::endl;
+
+	std::cout << std::endl;
+	std::cout << "Light: " << (light_flag ? "on" : "off");
+	std::cout << ", Wireframe: " << (wireframe_flag ? "on" : "off");
+	std::cout << ", Texture: " << (texture_flag ? "on" : "off");
+	std::cout << ", Blending: " << (blending_flag ? "on" : "off");
+	std::cout << std::endl;
+}
+
 void 
 sigint_handler (int sig)
 {
 	(void) sig;
 
+	print_test_setup();
 	print_stats(std::string("draw"), draw_times);
 	print_stats(std::string("swap"), swap_times);
+	std::cout << "---------------------------------------" << std::endl;
 	done = true;
 }
 
@@ -317,18 +380,42 @@ main (int argc, char *argv[])
 	init_extensions();
 	init_animation();
 
-	Point a {{ 1.0,  1.0,  1.0}};
-	Point b {{ 1.0, -1.0, -1.0}};
-	Point c {{-1.0,  1.0, -1.0}};
-	Point d {{-1.0, -1.0,  1.0}};
+	if (fractal == SIERPINSKY_TETRAHEDRON)
+	{
+		Point a {{ 1.0,  1.0,  1.0}};
+		Point b {{ 1.0, -1.0, -1.0}};
+		Point c {{-1.0,  1.0, -1.0}};
+		Point d {{-1.0, -1.0,  1.0}};
 
-	struct Tetrahedron tetrahedron {a, b, c, d};
-	std::vector<struct Triangle> triangles =
-	    create_sierpinsky_tetrahedron(tetrahedron, fractal_depth);
+		struct Tetrahedron tetrahedron {a, b, c, d};
+		std::vector<struct Triangle> triangles =
+				create_sierpinsky_tetrahedron(tetrahedron, fractal_depth);
 
-	data = convert_to_arrayf(triangles);
-	data_block_count = triangles.size();
-	//data_block_size = 3 + 3 + 4 + 2;
+		data = convert_to_arrayf(triangles);
+		data_block_count = triangles.size();
+		//data_block_size = 3 + 3 + 4 + 2;
+	}
+	else if (fractal == MENGER_SPONGE)
+	{
+		Point a {{-1.0, -1.0, -1.0}};
+		Point b {{1.0, -1.0, -1.0}};
+		Point c {{1.0, -1.0, 1.0}};
+		Point d {{-1.0, -1.0, 1.0}};
+		Point e {{-1.0, 1.0, -1.0}};
+		Point f {{1.0, 1.0, -1.0}};
+		Point g {{1.0, 1.0, 1.0}};
+		Point h {{-1.0, 1.0, 1.0}};
+
+		struct Cube cube {a, b, c, d, e, f, g, h};
+		std::vector<struct Quad> quads = 
+				create_menger_sponge(cube, fractal_depth);
+		data = convert_to_arrayf(quads);
+		data_block_count = quads.size();
+	}
+	else
+	{
+		quit(0);
+	}
 
 	return main_loop();
 }
