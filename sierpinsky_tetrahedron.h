@@ -9,3 +9,4 @@ std::vector<struct Triangle>
 create_sierpinsky_tetrahedron(struct Tetrahedron base, unsigned int depth);
 
 #endif
+
