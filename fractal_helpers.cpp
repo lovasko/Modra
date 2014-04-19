@@ -43,3 +43,41 @@ convert_to_arrayf(std::vector<struct Triangle> triangles)
 	return result;
 }
 
+GLfloat*
+convert_to_arrayf(std::vector<struct Quad> quads)
+{
+	size_t point_count = 12;
+	size_t normal_count = 12;
+	size_t color_count = 16;
+	size_t texcoord_count = 8;
+	size_t block_size = point_count + normal_count + color_count + texcoord_count;
+	size_t block_size_4 = block_size/4;//3 + 3 + 4 + 2;
+
+	size_t size = quads.size() * point_count * normal_count * color_count *
+	    texcoord_count;
+	GLfloat *result = (GLfloat*)malloc(sizeof(GLfloat) * size);
+
+	for (unsigned int i = 0; i < quads.size(); i++)
+	{
+		for (unsigned int k = 0; k < 4; k++)
+		{
+			result[(i * block_size_4 * 4) + k * block_size_4 + 0] = quads[i].points[k].tex_coord.coordinates[0];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 1] = quads[i].points[k].tex_coord.coordinates[1];
+
+			result[(i * block_size_4 * 4) + k * block_size_4 + 2] = quads[i].points[k].color.components[0];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 3] = quads[i].points[k].color.components[1];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 4] = quads[i].points[k].color.components[2];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 5] = quads[i].points[k].color.components[3];
+
+			result[(i * block_size_4 * 4) + k * block_size_4 + 6] = quads[i].points[k].normal.components[0];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 7] = quads[i].points[k].normal.components[1];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 8] = quads[i].points[k].normal.components[2];
+
+			result[(i * block_size_4 * 4) + k * block_size_4 + 9] = quads[i].points[k].components[0];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 10] = quads[i].points[k].components[1];
+			result[(i * block_size_4 * 4) + k * block_size_4 + 11] = quads[i].points[k].components[2];
+		}
+	}
+
+	return result;
+}
