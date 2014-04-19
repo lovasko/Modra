@@ -34,7 +34,16 @@ struct Color
 
 struct Point
 {
-	GLfloat components[3];
+	union
+	{
+		GLfloat components[3];
+		struct
+		{
+			GLfloat x;
+			GLfloat y;
+			GLfloat z;
+		};
+	};
 	struct Normal normal;
 	struct Color color;
 	struct TexCoord tex_coord;
@@ -53,6 +62,11 @@ struct Quad
 struct Tetrahedron
 {
 	struct Point points[4];
+};
+
+struct Cube 
+{
+	struct Point points[8];
 };
 
 #endif
