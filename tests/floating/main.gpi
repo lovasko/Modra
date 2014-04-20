@@ -1,0 +1,14 @@
+set terminal pdf enhanced
+set output 'floating.pdf'
+set title 'GLfloat vs GLdouble'
+set title font ',13'
+set xlabel 'Triangles'
+set ylabel 'Microseconds'
+set key left
+set style data histogram
+set style histogram cluster gap 1
+set style fill solid border rgb "black"
+set auto x
+set yrange [0:*]
+plot 'floating.dat' using 2:xtic(1) title col, \
+	           '' using 3:xtic(1) title col
