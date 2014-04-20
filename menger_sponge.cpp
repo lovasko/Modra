@@ -65,8 +65,6 @@ lin_interpol (struct Point a, struct Point b, GLfloat tx, GLfloat ty, GLfloat
 	GLfloat new_y = a.y + (b.y - a.y) * ty;	
 	GLfloat new_z = a.z + (b.z - a.z) * tz;	
 				
-	std::cout << new_x << " " << new_y << " " <<  new_z << std::endl;
-
 	struct Point result {new_x, new_y, new_z};
 	return result;
 }
@@ -112,7 +110,6 @@ create_menger_sponge(struct Cube base, unsigned int depth)
 					(GLfloat)i/3.0, 
 					(GLfloat)j/3.0, 
 					(GLfloat)k/3.0);
-
 			}
 
 			// cube front face
