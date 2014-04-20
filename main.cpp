@@ -16,6 +16,7 @@
 #include <numeric>
 #include <signal.h>
 
+#include "floating.h"
 #include "fractal_helpers.h"
 #include "sierpinsky_tetrahedron.h"
 #include "menger_sponge.h"
@@ -28,9 +29,9 @@ SDL_Surface *surface;
 bool vbo_capable;
 bool done;
 bool is_active;
-GLfloat angle;
+MyFloating angle;
 
-GLfloat *data;
+MyFloating *data;
 size_t data_block_count;
 size_t data_block_size;
 size_t data_point_count;
@@ -257,20 +258,26 @@ draw_scene ()
 				{
 					unsigned int k = i * 36;
 
-					glTexCoord2fv(data + k + 0);
-					//glColor4fv(data + k + 2);
-					glNormal3fv(data + k + 6);
-					glVertex3fv(data + k + 9);
+					if (texture_flag)
+						myTexCoord2v(data + k + 0);
+					myColor4v(data + k + 2);
+					if (light_flag)
+						myNormal3v(data + k + 6);
+					myVertex3v(data + k + 9);
 
-					glTexCoord2fv(data + k + 12);
-					//glColor4fv(data + k + 14);
-					glNormal3fv(data + k + 18);
-					glVertex3fv(data + k + 21);
+					if (texture_flag)
+						myTexCoord2v(data + k + 12);
+					myColor4v(data + k + 14);
+					if (light_flag)
+						myNormal3v(data + k + 18);
+					myVertex3v(data + k + 21);
 
-					glTexCoord2fv(data + k + 24);
-					//glColor4fv(data + k + 26);
-					glNormal3fv(data + k + 30);
-					glVertex3fv(data + k + 33);
+					if (texture_flag)
+						myTexCoord2v(data + k + 24);
+					myColor4v(data + k + 26);
+					if (light_flag)
+						myNormal3v(data + k + 30);
+					myVertex3v(data + k + 33);
 				}
 			glEnd();
 		}
@@ -281,25 +288,33 @@ draw_scene ()
 				{
 					unsigned int k = i * 48;
 
-					glTexCoord2fv(data + k + 0);
-					glColor4fv(data + k + 2);
-					glNormal3fv(data + k + 6);
-					glVertex3fv(data + k + 9);
+					if (texture_flag)
+						myTexCoord2v(data + k + 0);
+					myColor4v(data + k + 2);
+					if (light_flag)
+						myNormal3v(data + k + 6);
+					myVertex3v(data + k + 9);
 
-					glTexCoord2fv(data + k + 12);
-					glColor4fv(data + k + 14);
-					glNormal3fv(data + k + 18);
-					glVertex3fv(data + k + 21);
+					if (texture_flag)
+						myTexCoord2v(data + k + 12);
+					myColor4v(data + k + 14);
+					if (light_flag)
+						myNormal3v(data + k + 18);
+					myVertex3v(data + k + 21);
 
-					glTexCoord2fv(data + k + 24);
-					glColor4fv(data + k + 26);
-					glNormal3fv(data + k + 30);
-					glVertex3fv(data + k + 33);
+					if (texture_flag)
+						myTexCoord2v(data + k + 24);
+					myColor4v(data + k + 26);
+					if (light_flag)
+						myNormal3v(data + k + 30);
+					myVertex3v(data + k + 33);
 
-					glTexCoord2fv(data + k + 36);
-					glColor4fv(data + k + 38);
-					glNormal3fv(data + k + 42);
-					glVertex3fv(data + k + 45);
+					if (texture_flag)
+						myTexCoord2v(data + k + 36);
+					myColor4v(data + k + 38);
+					if (light_flag)
+						myNormal3v(data + k + 42);
+					myVertex3v(data + k + 45);
 				}
 			glEnd();
 		}
@@ -338,10 +353,6 @@ main_loop()
 				case SDL_ACTIVEEVENT:
 					if ( event.active.state == SDL_APPACTIVE )
 						is_active = (event.active.gain != 0);
-					break;
-
-				case SDL_KEYDOWN:
-					//handleKeyPress( &event.key.keysym );
 					break;
 
 				case SDL_QUIT:
@@ -405,6 +416,7 @@ sigint_handler (int sig)
 {
 	(void) sig;
 
+	std::cout << TypeName << std::endl;
 	print_test_setup();
 	print_stats(std::string("draw"), draw_times);
 	print_stats(std::string("swap"), swap_times);
@@ -425,8 +437,6 @@ catch_sigint()
 	sigaction(SIGINT, &new_sa, 0);
 }
 
-
-// apply object flag
 int 
 main (int argc, char *argv[])
 {
@@ -484,15 +494,23 @@ main (int argc, char *argv[])
 		}
 		else if (vertex_buffer == SEPARATE)
 		{
-			GLfloat *tex_coords_data = extract_tex_coords(data, data_point_count);
-			GLfloat *colors_data = extract_colors(data, data_point_count);
-			GLfloat *normals_data = extract_normals(data, data_point_count);
-			GLfloat *vertices_data = extract_vertices(data, data_point_count);
+			if (texture_flag)
+			{
+				MyFloating *tex_coords_data = extract_tex_coords(data, data_point_count);
+				glTexCoordPointer(2, MY_FLOATING, 0, tex_coords_data);
+			}
 
-			glTexCoordPointer(2, GL_FLOAT, 0, tex_coords_data);
-			glColorPointer(4, GL_FLOAT, 0, colors_data);
-			glNormalPointer(GL_FLOAT, 0, normals_data);
-			glVertexPointer(3, GL_FLOAT, 0, vertices_data);
+			MyFloating *colors_data = extract_colors(data, data_point_count);
+			glColorPointer(4, MY_FLOATING, 0, colors_data);
+
+			if (light_flag)
+			{
+				MyFloating *normals_data = extract_normals(data, data_point_count);
+				glNormalPointer(MY_FLOATING, 0, normals_data);
+			}
+
+			MyFloating *vertices_data = extract_vertices(data, data_point_count);
+			glVertexPointer(3, MY_FLOATING, 0, vertices_data);
 		}
 	}
 
