@@ -10,7 +10,7 @@ function run
 
 	"$TEST" -o "$1" -d "$2" -s "$3" -m "$4" -v "$5" -b "$6" -t "$7" -l "$8" -w "$9" &
 	PID="$!"
-	sleep 5 
+	sleep 20 
 	kill -s INT "$PID" 
 }
 
