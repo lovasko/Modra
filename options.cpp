@@ -10,7 +10,7 @@ parse_options (int argc, char *argv[])
 {
 	int option;	
 
-	while ((option = getopt(argc, argv, "d:o:m:l:w:t:b:s:")) != -1)
+	while ((option = getopt(argc, argv, "d:o:m:v:l:w:t:b:s:")) != -1)
 	{
 		switch(option)
 		{
@@ -42,6 +42,19 @@ parse_options (int argc, char *argv[])
 			else
 			{
 				fprintf(stderr, "unsupported drawing method\n");
+				exit(1);
+			}
+		break;
+
+		case 'v': 
+			if (strcmp("interleaved", optarg) == 0)
+				vertex_buffer = INTERLEAVED;
+			else if (strcmp("separate", optarg) == 0)
+				vertex_buffer = SEPARATE;
+			else if (strcmp("ignore", optarg) == 0) {}
+			else
+			{
+				fprintf(stderr, "unsupported vertex buffer type\n");
 				exit(1);
 			}
 		break;
