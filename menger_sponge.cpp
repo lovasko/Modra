@@ -1,3 +1,4 @@
+#include "floating.h"
 #include "menger_sponge.h"
 #include "utilities.h"
 
@@ -58,12 +59,12 @@ cube_starting_with (int i, int j, int k, struct Point (*cube_points)[4][4])
 }
 
 struct Point
-lin_interpol (struct Point a, struct Point b, GLfloat tx, GLfloat ty, GLfloat
-    tz)
+lin_interpol (struct Point a, struct Point b, MyFloating tx, MyFloating ty, 
+    MyFloating tz)
 {
-	GLfloat new_x = a.x + (b.x - a.x) * tx;	
-	GLfloat new_y = a.y + (b.y - a.y) * ty;	
-	GLfloat new_z = a.z + (b.z - a.z) * tz;	
+	MyFloating new_x = a.x + (b.x - a.x) * tx;	
+	MyFloating new_y = a.y + (b.y - a.y) * ty;	
+	MyFloating new_z = a.z + (b.z - a.z) * tz;	
 				
 	struct Point result {new_x, new_y, new_z};
 	return result;
@@ -107,9 +108,9 @@ create_menger_sponge(struct Cube base, unsigned int depth)
 			for (int k = 0; k < 4; k++)
 			{
 				cube[i][j][k] = lin_interpol(a, g, 
-					(GLfloat)i/3.0, 
-					(GLfloat)j/3.0, 
-					(GLfloat)k/3.0);
+					(MyFloating)i/3.0, 
+					(MyFloating)j/3.0, 
+					(MyFloating)k/3.0);
 			}
 
 			// cube front face

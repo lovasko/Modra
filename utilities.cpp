@@ -11,7 +11,7 @@ compute_normal (struct Vector a, struct Vector b)
 	result.components[1] = a.z * b.x - a.x * b.z;
 	result.components[2] = a.y * b.y - a.y * b.x;
 
-	GLfloat length = sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+	MyFloating length = sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
 	result.components[0] /= length;
 	result.components[1] /= length;
 	result.components[2] /= length;
@@ -34,10 +34,10 @@ struct Color
 random_color ()
 {
 	struct Color result;
-	result.components[0] = (GLfloat)(rand() % 1000) / (GLfloat)999.0;
-	result.components[1] = (GLfloat)(rand() % 1000) / (GLfloat)999.0;
-	result.components[2] = (GLfloat)(rand() % 1000) / (GLfloat)999.0;
-	result.components[3] = (GLfloat)0.5;
+	result.components[0] = (MyFloating)(rand() % 1000) / (GLfloat)999.0;
+	result.components[1] = (MyFloating)(rand() % 1000) / (GLfloat)999.0;
+	result.components[2] = (MyFloating)(rand() % 1000) / (GLfloat)999.0;
+	result.components[3] = (MyFloating)0.5;
 
 	return result;
 }
