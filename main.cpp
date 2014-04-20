@@ -34,6 +34,7 @@ GLfloat *data;
 size_t data_block_count;
 size_t data_block_size;
 size_t data_point_count;
+GLuint tex;
 
 enum Fractal fractal = SIERPINSKY_TETRAHEDRON;
 unsigned int fractal_depth = 5;
@@ -98,6 +99,35 @@ resize_viewport ()
   glDepthFunc(GL_LEQUAL);
 }
 
+GLubyte*
+generate_texture ()
+{
+	GLubyte *result;
+
+	result = (GLubyte*)malloc(sizeof(GLubyte) * 64 * 64 * 4);
+	memset(result, 255, 64*64*4);
+
+	for (int i = 0; i < 64 * 64 * 4; i++)
+	{
+		if (i % 4 == 0)
+		{
+			int xy = i/4;
+			int x = xy / 64 - 32;
+			int y = xy % 64 - 32;
+
+			if (y*y + x*x< 32*32)
+			{
+				result[i+0] = (sin(x))*255;
+				result[i+1] = (sin(y))*255;
+				result[i+2] = (sin(x))*255;
+				result[i+3] = 32;
+			}
+		}
+	}
+
+	return result;
+}
+
 void
 init_opengl ()
 {
@@ -144,12 +174,20 @@ init_opengl ()
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 	}
 
-	/*
 	if (texture_flag)
 	{
 		glEnable(GL_TEXTURE_2D);
+		glGenTextures(1, &tex); 
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,GL_MODULATE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+		GLubyte *pixels = generate_texture();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA,
+		    GL_UNSIGNED_BYTE, pixels);
+
 	}
-	*/
 
 	switch (shading_method)
 	{
@@ -213,23 +251,24 @@ draw_scene ()
 	{
 		if (fractal == SIERPINSKY_TETRAHEDRON)
 		{
+			glBindTexture(GL_TEXTURE_2D, tex);
 			glBegin(GL_TRIANGLES);
 				for (unsigned int i = 0; i < data_block_count; i++)
 				{
 					unsigned int k = i * 36;
 
 					glTexCoord2fv(data + k + 0);
-					glColor4fv(data + k + 2);
+					//glColor4fv(data + k + 2);
 					glNormal3fv(data + k + 6);
 					glVertex3fv(data + k + 9);
 
 					glTexCoord2fv(data + k + 12);
-					glColor4fv(data + k + 14);
+					//glColor4fv(data + k + 14);
 					glNormal3fv(data + k + 18);
 					glVertex3fv(data + k + 21);
 
 					glTexCoord2fv(data + k + 24);
-					glColor4fv(data + k + 26);
+					//glColor4fv(data + k + 26);
 					glNormal3fv(data + k + 30);
 					glVertex3fv(data + k + 33);
 				}
