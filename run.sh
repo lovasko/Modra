@@ -5,9 +5,12 @@
 # the statistical information
 function run 
 {
-	./test -o "$1" -d "$2" -s "$3" -m "$4" -v "$5" -b "$6" -t "$7" -l "$8" -w "$9" &
+	TEST='./testf'
+	test "${10}" = "double" && TEST='./testd'
+
+	"$TEST" -o "$1" -d "$2" -s "$3" -m "$4" -v "$5" -b "$6" -t "$7" -l "$8" -w "$9" &
 	PID="$!"
-	sleep 20 
+	sleep 5 
 	kill -s INT "$PID" 
 }
 
@@ -17,43 +20,72 @@ function main
 	./info
 
 	# flat basics in immediate mode
-	run sierpinsky 1 flat immediate ignore off off off off
-	run sierpinsky 3 flat immediate ignore off off off off
-	run sierpinsky 5 flat immediate ignore off off off off
-	run sierpinsky 7 flat immediate ignore off off off off
-	run sierpinsky 9 flat immediate ignore off off off off
+	echo "" > tests/floating/float
+	run sierpinsky 1 flat immediate ignore off off off off >> tests/floating/float 
+	run sierpinsky 3 flat immediate ignore off off off off >> tests/floating/float
+	run sierpinsky 5 flat immediate ignore off off off off >> tests/floating/float
+	run sierpinsky 7 flat immediate ignore off off off off >> tests/floating/float
+	run sierpinsky 9 flat immediate ignore off off off off >> tests/floating/float
 
-	# flat basics in vertex-buffer mode 
-	run sierpinsky 1 flat vertex-buffer interleaved off off off off
-	run sierpinsky 3 flat vertex-buffer interleaved off off off off
-	run sierpinsky 5 flat vertex-buffer interleaved off off off off
-	run sierpinsky 7 flat vertex-buffer interleaved off off off off
-	run sierpinsky 9 flat vertex-buffer interleaved off off off off
+	# flat basics in immediate mode (double)
+	echo "" > tests/floating/double 
+	run sierpinsky 1 flat immediate ignore off off off off double >> tests/floating/double 
+	run sierpinsky 3 flat immediate ignore off off off off double >> tests/floating/double 
+	run sierpinsky 5 flat immediate ignore off off off off double >> tests/floating/double 
+	run sierpinsky 7 flat immediate ignore off off off off double >> tests/floating/double 
+	run sierpinsky 9 flat immediate ignore off off off off double >> tests/floating/double 
+
+	# create graph for above
+	(cd ./tests/floating && ./main.sh)
+
+  # flat basics in immediate mode 
+	run sierpinsky 6 flat immediate ignore off off off off > tests/vertex_buffer/immediate
+
+	# flat basics in vertex-buffer mode interleaved
+	run sierpinsky 6 flat vertex-buffer interleaved off off off off > tests/vertex_buffer/interleaved
+
+	# flat basics in vertex-buffer mode separate
+	run sierpinsky 6 flat vertex-buffer separate off off off off > tests/vertex_buffer/separate
+
+	# create graph for above
+	(cd ./tests/vertex_buffer && ./main.sh)
 
 	# smooth basics in immediate mode
-	run sierpinsky 1 smooth immediate ignore off off off off
-	run sierpinsky 3 smooth immediate ignore off off off off
-	run sierpinsky 5 smooth immediate ignore off off off off
-	run sierpinsky 7 smooth immediate ignore off off off off
-	run sierpinsky 9 smooth immediate ignore off off off off
+	run sierpinsky 6 smooth immediate ignore off off off off > tests/shading/smooth
 
 	# blending
-	run sierpinsky 5 flat immediate ignore on off off off
+	run sierpinsky 6 flat immediate ignore off off off off > tests/shading/flat
 
-	# wireframe 
-	run sierpinsky 5 flat immediate ignore off off off on
+	# create graph for above
+	(cd ./tests/shading && ./main.sh)
+
+	# menger sponge basic tests
+	echo "" > tests/quads/quads
+	run menger 1 flat immediate ignore off off off off >> tests/quads/quads
+	run menger 2 flat immediate ignore off off off off >> tests/quads/quads
+	run menger 3 flat immediate ignore off off off off >> tests/quads/quads
+	run menger 4 flat immediate ignore off off off off >> tests/quads/quads
+
+	# create graph for above
+	(cd ./tests/quads && ./main.sh)
+
+	# blending
+	run menger 3 flat immediate ignore on off off off > tests/various/blending
+
+	# texture tests
+	run menger 3 flat immediate ignore off on off off > tests/various/textures
 
 	# light 
-	run sierpinsky 5 flat immediate ignore off off on off
+	run menger 3 flat immediate ignore off off on off > tests/various/light
 
-	# light & blending
-	run sierpinsky 3 flat immediate ignore on off on off
+	# wireframe
+	run menger 3 flat immediate ignore off off off on > tests/various/wireframe
 
-	# light & blending
-	run sierpinsky 5 flat immediate ignore on off on off
+	# all but wireframe 
+	run menger 3 flat immediate ignore on on on off > tests/various/all
 
-	# light & blending
-	run sierpinsky 7 flat immediate ignore on off on off
+	# create graph for above
+	(cd ./tests/various && ./main.sh)
 }
 
 main
