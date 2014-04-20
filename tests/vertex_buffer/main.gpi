@@ -1,0 +1,13 @@
+set terminal pdf enhanced
+set output 'vertex_buffer.pdf'
+set title 'Immediate mode vs Vertex buffer methods'
+set title font ',13'
+set xlabel 'Methods'
+set ylabel 'Microseconds'
+set key left
+set style data histogram
+set style histogram rowstacked
+set style fill solid border rgb "black"
+set auto x
+set yrange [0:*]
+plot 'vertex_buffer.dat' using 2 t "Draw", '' using 3:xticlabels(1) t "Swap"
