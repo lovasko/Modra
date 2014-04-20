@@ -33,6 +33,7 @@ GLfloat angle;
 GLfloat *data;
 size_t data_block_count;
 size_t data_block_size;
+size_t data_point_count;
 
 enum Fractal fractal = SIERPINSKY_TETRAHEDRON;
 unsigned int fractal_depth = 5;
@@ -101,10 +102,14 @@ void
 init_opengl ()
 {
 	glShadeModel(GL_SMOOTH);
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-  glClearDepth(20.0f);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(20.0f);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 
 	resize_viewport();
 
@@ -204,62 +209,76 @@ draw_scene ()
 	apply_animation();
 	glScalef(2.6, 2.6, 2.6);
 
-	if (fractal == SIERPINSKY_TETRAHEDRON)
+	if (drawing_method == IMMEDIATE)
 	{
-		glBegin(GL_TRIANGLES);
-			for (unsigned int i = 0; i < data_block_count; i++)
-			{
-				unsigned int k = i * 36;
+		if (fractal == SIERPINSKY_TETRAHEDRON)
+		{
+			glBegin(GL_TRIANGLES);
+				for (unsigned int i = 0; i < data_block_count; i++)
+				{
+					unsigned int k = i * 36;
 
-				glTexCoord2fv(data + k + 0);
-				glColor4fv(data + k + 2);
-				glNormal3fv(data + k + 6);
-				glVertex3fv(data + k + 9);
+					glTexCoord2fv(data + k + 0);
+					glColor4fv(data + k + 2);
+					glNormal3fv(data + k + 6);
+					glVertex3fv(data + k + 9);
 
-				glTexCoord2fv(data + k + 12);
-				glColor4fv(data + k + 14);
-				glNormal3fv(data + k + 18);
-				glVertex3fv(data + k + 21);
+					glTexCoord2fv(data + k + 12);
+					glColor4fv(data + k + 14);
+					glNormal3fv(data + k + 18);
+					glVertex3fv(data + k + 21);
 
-				glTexCoord2fv(data + k + 24);
-				glColor4fv(data + k + 26);
-				glNormal3fv(data + k + 30);
-				glVertex3fv(data + k + 33);
-			}
-		glEnd();
+					glTexCoord2fv(data + k + 24);
+					glColor4fv(data + k + 26);
+					glNormal3fv(data + k + 30);
+					glVertex3fv(data + k + 33);
+				}
+			glEnd();
+		}
+		else if (fractal == MENGER_SPONGE)
+		{
+			glBegin(GL_QUADS);
+				for (unsigned int i = 0; i < data_block_count; i++)
+				{
+					unsigned int k = i * 48;
+
+					glTexCoord2fv(data + k + 0);
+					glColor4fv(data + k + 2);
+					glNormal3fv(data + k + 6);
+					glVertex3fv(data + k + 9);
+
+					glTexCoord2fv(data + k + 12);
+					glColor4fv(data + k + 14);
+					glNormal3fv(data + k + 18);
+					glVertex3fv(data + k + 21);
+
+					glTexCoord2fv(data + k + 24);
+					glColor4fv(data + k + 26);
+					glNormal3fv(data + k + 30);
+					glVertex3fv(data + k + 33);
+
+					glTexCoord2fv(data + k + 36);
+					glColor4fv(data + k + 38);
+					glNormal3fv(data + k + 42);
+					glVertex3fv(data + k + 45);
+				}
+			glEnd();
+		}
+		else
+		{
+			glClearColor(1.0, 0.0, 0.0, 1.0);
+		}
 	}
-	else if (fractal == MENGER_SPONGE)
+	else if (drawing_method == VERTEX_BUFFER)
 	{
-		glBegin(GL_QUADS);
-			for (unsigned int i = 0; i < data_block_count; i++)
-			{
-				unsigned int k = i * 48;
-
-				glTexCoord2fv(data + k + 0);
-				glColor4fv(data + k + 2);
-				glNormal3fv(data + k + 6);
-				glVertex3fv(data + k + 9);
-
-				glTexCoord2fv(data + k + 12);
-				glColor4fv(data + k + 14);
-				glNormal3fv(data + k + 18);
-				glVertex3fv(data + k + 21);
-
-				glTexCoord2fv(data + k + 24);
-				glColor4fv(data + k + 26);
-				glNormal3fv(data + k + 30);
-				glVertex3fv(data + k + 33);
-
-				glTexCoord2fv(data + k + 36);
-				glColor4fv(data + k + 38);
-				glNormal3fv(data + k + 42);
-				glVertex3fv(data + k + 45);
-			}
-		glEnd();
-	}
-	else
-	{
-		glClearColor(1.0, 0.0, 0.0, 1.0);
+		if (fractal == SIERPINSKY_TETRAHEDRON)
+		{
+			glDrawArrays(GL_TRIANGLES, 0, data_point_count);
+		}
+		else if (fractal == MENGER_SPONGE)
+		{
+			glDrawArrays(GL_QUADS, 0, data_point_count);
+		}
 	}
 
   glFlush();
@@ -331,8 +350,8 @@ print_test_setup ()
 	    "Index buffer"));
 	
 	if (drawing_method == VERTEX_BUFFER || drawing_method == INDEX_BUFFER)
-	    std::cout << "Vertex buffer type: " << (vertex_buffer == SEPARATE ?
-	        "Separate" : "Interleaved") << std::endl;
+	    std::cout << std::endl << "Vertex buffer type: " << 
+			(vertex_buffer == SEPARATE ?  "Separate" : "Interleaved") << std::endl;
 
 	std::cout << std::endl;
 	std::cout << "Light: " << (light_flag ? "on" : "off");
@@ -393,7 +412,7 @@ main (int argc, char *argv[])
 
 		data = convert_to_arrayf(triangles);
 		data_block_count = triangles.size();
-		//data_block_size = 3 + 3 + 4 + 2;
+		data_point_count = data_block_count * 3;
 	}
 	else if (fractal == MENGER_SPONGE)
 	{
@@ -411,10 +430,31 @@ main (int argc, char *argv[])
 				create_menger_sponge(cube, fractal_depth);
 		data = convert_to_arrayf(quads);
 		data_block_count = quads.size();
+		data_point_count = data_block_count * 4;
 	}
 	else
 	{
 		quit(0);
+	}
+
+	if (drawing_method == VERTEX_BUFFER)
+	{
+		if (vertex_buffer == INTERLEAVED)
+		{
+			glInterleavedArrays(GL_T2F_C4F_N3F_V3F, 0, data);
+		}
+		else if (vertex_buffer == SEPARATE)
+		{
+			GLfloat *tex_coords_data = extract_tex_coords(data, data_point_count);
+			GLfloat *colors_data = extract_colors(data, data_point_count);
+			GLfloat *normals_data = extract_normals(data, data_point_count);
+			GLfloat *vertices_data = extract_vertices(data, data_point_count);
+
+			glTexCoordPointer(2, GL_FLOAT, 0, tex_coords_data);
+			glColorPointer(4, GL_FLOAT, 0, colors_data);
+			glNormalPointer(GL_FLOAT, 0, normals_data);
+			glVertexPointer(3, GL_FLOAT, 0, vertices_data);
+		}
 	}
 
 	return main_loop();
