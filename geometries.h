@@ -3,45 +3,47 @@
 
 #include <OpenGL/gl.h>
 
+#include "floating.h"
+
 struct Normal 
 {
-	GLfloat components[3];
+	MyFloating components[3];
 };
 
 struct Vector 
 {
 	union
 	{
-		GLfloat components[3];
+		MyFloating components[3];
 		struct
 		{
-			GLfloat x;
-			GLfloat y;
-			GLfloat z;
+			MyFloating x;
+			MyFloating y;
+			MyFloating z;
 		};
 	};
 };
 
 struct TexCoord
 {
-	GLfloat coordinates[2];
+	MyFloating coordinates[2];
 };
 
 struct Color
 {
-	GLfloat components[4];
+	MyFloating components[4];
 };
 
 struct Point
 {
 	union
 	{
-		GLfloat components[3];
+		MyFloating components[3];
 		struct
 		{
-			GLfloat x;
-			GLfloat y;
-			GLfloat z;
+			MyFloating x;
+			MyFloating y;
+			MyFloating z;
 		};
 	};
 	struct Normal normal;
