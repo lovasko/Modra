@@ -81,3 +81,67 @@ convert_to_arrayf(std::vector<struct Quad> quads)
 
 	return result;
 }
+
+GLfloat*
+extract_tex_coords(GLfloat* data, size_t entry_count)
+{
+	GLfloat *result;
+
+	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 2);
+	for (unsigned int i = 0; i < entry_count; i++)
+	{
+		result[i*2 + 0] = data[i*12 + 0];
+		result[i*2 + 1] = data[i*12 + 1];
+	}
+
+	return result;
+}
+
+GLfloat*
+extract_colors(GLfloat* data, size_t entry_count)
+{
+	GLfloat *result;
+
+	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 4);
+	for (unsigned int i = 0; i < entry_count; i++)
+	{
+		result[i*4 + 0] = data[i*12 + 2];
+		result[i*4 + 1] = data[i*12 + 3];
+		result[i*4 + 2] = data[i*12 + 4];
+		result[i*4 + 3] = data[i*12 + 5];
+	}
+
+	return result;
+}
+
+GLfloat*
+extract_normals(GLfloat* data, size_t entry_count)
+{
+	GLfloat *result;
+
+	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 3);
+	for (unsigned int i = 0; i < entry_count; i++)
+	{
+		result[i*3 + 0] = data[i*12 + 6];
+		result[i*3 + 1] = data[i*12 + 7];
+		result[i*3 + 2] = data[i*12 + 8];
+	}
+
+	return result;
+}
+
+GLfloat*
+extract_vertices(GLfloat* data, size_t entry_count)
+{
+	GLfloat *result;
+
+	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 3);
+	for (unsigned int i = 0; i < entry_count; i++)
+	{
+		result[i*3 + 0] = data[i*12 + 9];
+		result[i*3 + 1] = data[i*12 + 10];
+		result[i*3 + 2] = data[i*12 + 11];
+	}
+
+	return result;
+}
