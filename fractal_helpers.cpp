@@ -4,7 +4,7 @@
 #include "fractal_helpers.h"
 
 // GL_T2F_C4F_N3F_V3F
-GLfloat*
+MyFloating*
 convert_to_arrayf(std::vector<struct Triangle> triangles)
 {
 	size_t point_count = 9;
@@ -16,7 +16,7 @@ convert_to_arrayf(std::vector<struct Triangle> triangles)
 
 	size_t size = triangles.size() * point_count * normal_count * color_count *
 	    texcoord_count;
-	GLfloat *result = (GLfloat*)malloc(sizeof(GLfloat) * size);
+	MyFloating *result = (MyFloating*)malloc(sizeof(MyFloating) * size);
 
 	for (unsigned int i = 0; i < triangles.size(); i++)
 	{
@@ -43,7 +43,7 @@ convert_to_arrayf(std::vector<struct Triangle> triangles)
 	return result;
 }
 
-GLfloat*
+MyFloating*
 convert_to_arrayf(std::vector<struct Quad> quads)
 {
 	size_t point_count = 12;
@@ -55,7 +55,7 @@ convert_to_arrayf(std::vector<struct Quad> quads)
 
 	size_t size = quads.size() * point_count * normal_count * color_count *
 	    texcoord_count;
-	GLfloat *result = (GLfloat*)malloc(sizeof(GLfloat) * size);
+	MyFloating *result = (MyFloating*)malloc(sizeof(MyFloating) * size);
 
 	for (unsigned int i = 0; i < quads.size(); i++)
 	{
@@ -82,12 +82,12 @@ convert_to_arrayf(std::vector<struct Quad> quads)
 	return result;
 }
 
-GLfloat*
-extract_tex_coords(GLfloat* data, size_t entry_count)
+MyFloating*
+extract_tex_coords(MyFloating* data, size_t entry_count)
 {
-	GLfloat *result;
+	MyFloating *result;
 
-	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 2);
+	result = (MyFloating*)malloc(sizeof(MyFloating) * entry_count * 2);
 	for (unsigned int i = 0; i < entry_count; i++)
 	{
 		result[i*2 + 0] = data[i*12 + 0];
@@ -97,12 +97,12 @@ extract_tex_coords(GLfloat* data, size_t entry_count)
 	return result;
 }
 
-GLfloat*
-extract_colors(GLfloat* data, size_t entry_count)
+MyFloating*
+extract_colors(MyFloating* data, size_t entry_count)
 {
-	GLfloat *result;
+	MyFloating *result;
 
-	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 4);
+	result = (MyFloating*)malloc(sizeof(MyFloating) * entry_count * 4);
 	for (unsigned int i = 0; i < entry_count; i++)
 	{
 		result[i*4 + 0] = data[i*12 + 2];
@@ -114,12 +114,12 @@ extract_colors(GLfloat* data, size_t entry_count)
 	return result;
 }
 
-GLfloat*
-extract_normals(GLfloat* data, size_t entry_count)
+MyFloating*
+extract_normals(MyFloating* data, size_t entry_count)
 {
-	GLfloat *result;
+	MyFloating *result;
 
-	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 3);
+	result = (MyFloating*)malloc(sizeof(MyFloating) * entry_count * 3);
 	for (unsigned int i = 0; i < entry_count; i++)
 	{
 		result[i*3 + 0] = data[i*12 + 6];
@@ -130,12 +130,12 @@ extract_normals(GLfloat* data, size_t entry_count)
 	return result;
 }
 
-GLfloat*
-extract_vertices(GLfloat* data, size_t entry_count)
+MyFloating*
+extract_vertices(MyFloating* data, size_t entry_count)
 {
-	GLfloat *result;
+	MyFloating *result;
 
-	result = (GLfloat*)malloc(sizeof(GLfloat) * entry_count * 3);
+	result = (MyFloating*)malloc(sizeof(MyFloating) * entry_count * 3);
 	for (unsigned int i = 0; i < entry_count; i++)
 	{
 		result[i*3 + 0] = data[i*12 + 9];
